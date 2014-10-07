@@ -2,7 +2,7 @@ package jogosenha;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import jogosenha.Models.Server;
+import Models.Server;
 
 public class ServerService {
 
