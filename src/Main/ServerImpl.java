@@ -1,4 +1,4 @@
-package jogosenha;
+package Main;
 
 import Interfaces.ServerInterface;
 import Enumerators.GameColors;

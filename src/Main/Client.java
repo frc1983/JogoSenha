@@ -1,4 +1,4 @@
-package jogosenha;
+package Main;
 
 import Interfaces.ServerInterface;
 import java.net.MalformedURLException;
@@ -6,7 +6,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-public class Cliente {
+public class Client {
 
     public static void main(String[] args) throws RemoteException, NotBoundException {
         try {
