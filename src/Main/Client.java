@@ -1,4 +1,4 @@
-package jogosenha;
+package Main;
 
 import Enumerators.GameColors;
 import Interfaces.ServerInterface;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import jdk.net.Sockets;
 
-public class Cliente {
+public class Client {
 
     private static Player player;
 

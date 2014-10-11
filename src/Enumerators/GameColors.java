@@ -1,4 +1,3 @@
-
 package Enumerators;
 
 public enum GameColors {
