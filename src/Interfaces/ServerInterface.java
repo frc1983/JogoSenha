@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public interface ServerInterface extends Remote {
     
-    public int getPID(String name) throws RemoteException;
-    public boolean getGame(int pid) throws RemoteException;
-    public ArrayList<ResultColors> attempt(int pid, ArrayList<GameColors> attempt);
-    public String getLeaderBoard();
+    public String getPID() throws RemoteException;
+    public boolean getGame(String pid) throws RemoteException;
+    public ArrayList<ResultColors> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException;
+    public String getLeaderBoard() throws RemoteException;
 }
