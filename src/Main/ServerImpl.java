@@ -24,7 +24,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 
     @Override
     public String getPID() throws RemoteException {
-        System.out.println("PidSever > Solicitacao");
+        Helpers.ShowMessage.showMessage("server", "PidSever > Solicitacao");
         UUID id = UUID.randomUUID();
         return id.toString();
     }
@@ -36,17 +36,19 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         //Gerar uma senha para este jogo e coloca-lo na lista de <PId, Senha> do server
         this.passwordsActiveGames.put(pid, generatePassword());
         
-        System.out.println("SERVER - Jogo criado para = " + pid);
+        Helpers.ShowMessage.showMessage("server","Jogo criado para = " + pid);
         //Retorna true para jogo criado e false para erro ao criar o jogo
-        return game != null && !this.passwordsActiveGames.get(pid).isEmpty();
+        return !this.passwordsActiveGames.get(pid).isEmpty();
     }
 
     @Override
-    public ArrayList<ResultColors> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException {
+    public HashMap<Boolean, ArrayList<ResultColors>> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException {
         //Busca a resposta para o jogo do PID na lista de <PId, Senha> do server
         //Compara a tentativa recebida com a resposta
         //Retorna as cores de acordo com os acertos da tentativa
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        HashMap<Boolean, ArrayList<ResultColors>> result = new HashMap<>();
+        result.put(Boolean.FALSE, new ArrayList<ResultColors>());
+        return result;
     }
 
     @Override
@@ -56,10 +58,13 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
     }
 
     private ArrayList<GameColors> generatePassword() {
-        ArrayList<GameColors> ret = new ArrayList<GameColors>(4);        
+        ArrayList<GameColors> ret = new ArrayList<>(4);        
         
         for(int i = 0; i < 4; i++){
             GameColors color = getRandom();
+            while(ret.contains(color)){
+                color = getRandom();
+            }
             ret.add(i, color);
         }
         
