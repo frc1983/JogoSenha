@@ -21,17 +21,16 @@ public class Client {
     public static void main(String[] args) throws RemoteException, NotBoundException, Exception {
         try {
             result = new HashMap<>();
-            Boolean done = false;
+            Boolean done;
             
             ServerInterface p = (ServerInterface) Naming.lookup("//localhost/PID");
-            Helpers.ShowMessage.showMessage("client", "PID = " + p.getPID());
 
             //Solicitar PID, monta o player sem jogo
             player = new Player(p.getPID(), getPlayerName(args));
 
             //Solicitar jogo
             if (p.getGame(player.getPid())) {
-                Helpers.ShowMessage.showMessage("client", "Jogo criado para = " + p.getPID());
+                Helpers.ShowMessage.showMessage("client", "Jogo criado para = " + player.getPid());
             } else {
                 throw new Exception("Não foi possível criar o jogo.");
             }
@@ -56,10 +55,12 @@ public class Client {
                 result = p.attempt(player.getPid(), selectedColors);
                 done = (Boolean) result.keySet().toArray()[0];
                 
+                showResults(result.get(done));
                 if(!done){
                     Helpers.ShowMessage.showMessage("client", "Errou, tente novamente!");
                 }else{
                     Helpers.ShowMessage.showMessage("client", "Acertou, Parabéns!");
+                    p.killGame(player.getPid());
                 }
 
             } while (!done);
@@ -67,6 +68,12 @@ public class Client {
         } catch (MalformedURLException | RemoteException e) {
         } catch (NotBoundException e) {
             e.getStackTrace();
+        }
+    }
+    
+    private static void showResults(ArrayList<ResultColors> result){
+        for(ResultColors color : result){
+            Helpers.ShowMessage.showMessage("client", color.name());
         }
     }
 

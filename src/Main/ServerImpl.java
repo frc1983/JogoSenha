@@ -9,7 +9,10 @@ import Models.LeaderBoards;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
@@ -40,15 +43,18 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         //Retorna true para jogo criado e false para erro ao criar o jogo
         return !this.passwordsActiveGames.get(pid).isEmpty();
     }
+    
+    @Override
+    public void killGame(String pid) throws RemoteException {
+        this.passwordsActiveGames.remove(pid);
+    }
 
     @Override
     public HashMap<Boolean, ArrayList<ResultColors>> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException {
         //Busca a resposta para o jogo do PID na lista de <PId, Senha> do server
-        //Compara a tentativa recebida com a resposta
-        //Retorna as cores de acordo com os acertos da tentativa
-        HashMap<Boolean, ArrayList<ResultColors>> result = new HashMap<>();
-        result.put(Boolean.FALSE, new ArrayList<ResultColors>());
-        return result;
+        ArrayList<GameColors> password = this.passwordsActiveGames.get(pid);
+             
+        return validateAttempt(password, attempt);
     }
 
     @Override
@@ -70,4 +76,33 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         
         return ret;
     }
+    
+    private HashMap<Boolean, ArrayList<ResultColors>> validateAttempt(ArrayList<GameColors> password, ArrayList<GameColors> attempt){
+        //Compara a tentativa recebida com a resposta
+        //Retorna as cores de acordo com os acertos da tentativa   
+        HashMap<Boolean, ArrayList<ResultColors>> result = new HashMap<>();
+        ArrayList<ResultColors> resultColors = new ArrayList<>();
+        Boolean matchPassword = true;
+        
+        for (int i = 0; i < attempt.size(); i++) {
+            for(int j = 0; j < password.size(); j++) {
+                if(attempt.get(i).equals(password.get(j)) && i == j){
+                    resultColors.add(ResultColors.PRETO);
+                    break;
+                }
+                else if(attempt.get(i).equals(password.get(j)) && i != j){
+                    resultColors.add(ResultColors.BRANCO);
+                    break;
+                }
+            }
+        }
+        
+        matchPassword = Collections.frequency(resultColors, ResultColors.PRETO) == 4;
+        
+        Collections.shuffle(resultColors);
+        result.put(matchPassword, resultColors);
+        
+        return result;
+    }
+        
 }
