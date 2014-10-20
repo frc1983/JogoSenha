@@ -4,14 +4,12 @@ import Enumerators.GameColors;
 import Enumerators.ResultColors;
 import Interfaces.ServerInterface;
 import Models.Player;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import jdk.net.Sockets;
 
 public class Client {
 
@@ -19,17 +17,22 @@ public class Client {
     private static HashMap<Boolean, ArrayList<ResultColors>> result;
 
     public static void main(String[] args) throws RemoteException, NotBoundException, Exception {
+        ServerInterface p = null;
+        result = new HashMap<>();
+        Boolean done;
+        int attemptNumber = 0;
+        String playerPID = null;
+        
         try {
-            result = new HashMap<>();
-            Boolean done;
+            p = (ServerInterface) Naming.lookup("//localhost/PID");
             
-            ServerInterface p = (ServerInterface) Naming.lookup("//localhost/PID");
+            Helpers.ShowMessage.showMessage("client", p.getLeaderBoard());
 
             //Solicitar PID, monta o player sem jogo
             player = new Player(p.getPID(), getPlayerName(args));
-
+            playerPID = player.getPid();
             //Solicitar jogo
-            if (p.getGame(player.getPid())) {
+            if (p.getGame(playerPID)) {
                 Helpers.ShowMessage.showMessage("client", "Jogo criado para = " + player.getPid());
             } else {
                 throw new Exception("Não foi possível criar o jogo.");
@@ -47,32 +50,33 @@ public class Client {
 
                     selectedColors.add(GameColors.getColor(s.nextInt()));
                 }
-                
+
                 //Salva tentativa do usuário
                 player.attempt.add(selectedColors);
                 //Enviar tentativa
                 Helpers.ShowMessage.showMessage("client", "Enviando tentativa");
-                result = p.attempt(player.getPid(), selectedColors);
+                result = p.attempt(playerPID, selectedColors);
                 done = (Boolean) result.keySet().toArray()[0];
                 
+                attemptNumber++;
+                Helpers.ShowMessage.showMessage("client", "Tentativa número " + attemptNumber);
                 showResults(result.get(done));
-                if(!done){
+                if (!done) {
                     Helpers.ShowMessage.showMessage("client", "Errou, tente novamente!");
-                }else{
+                } else {
                     Helpers.ShowMessage.showMessage("client", "Acertou, Parabéns!");
-                    p.killGame(player.getPid());
+                    p.setLeaderboard(playerPID, player.getName(), attemptNumber);
+                    p.killGame(playerPID);
                 }
 
             } while (!done);
-            
-        } catch (MalformedURLException | RemoteException e) {
-        } catch (NotBoundException e) {
-            e.getStackTrace();
+        } catch (Exception e) {
+            p.killGame(playerPID);
         }
     }
-    
-    private static void showResults(ArrayList<ResultColors> result){
-        for(ResultColors color : result){
+
+    private static void showResults(ArrayList<ResultColors> result) {
+        for (ResultColors color : result) {
             Helpers.ShowMessage.showMessage("client", color.name());
         }
     }
@@ -92,13 +96,13 @@ public class Client {
         System.out.println("4 para ROXO");
         System.out.println("5 para ROSA");
     }
-    
-    private static int readOption(Scanner s){
+
+    private static int readOption(Scanner s) {
         ShowOptions();
         do {
             s = new Scanner(System.in);
         } while (!s.hasNextInt());
-        
+
         return s.nextInt();
     }
 }

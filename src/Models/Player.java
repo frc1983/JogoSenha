@@ -20,4 +20,8 @@ public class Player {
     public String getPid() {
         return pid;
     }
+    
+    public String getName() {
+        return name;
+    }
 }
