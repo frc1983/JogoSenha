@@ -10,10 +10,10 @@ import java.util.HashMap;
 
 public interface ServerInterface extends Remote {
     
-    public String getPID() throws RemoteException;
-    public boolean getGame(String pid) throws RemoteException;
-    public void killGame(String pid) throws RemoteException;
-    public HashMap<Boolean, ArrayList<ResultColors>> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException;
-    public String getLeaderBoard() throws RemoteException;
-    public void setLeaderboard(String pid, String name, int attempts) throws RemoteException;
+    public String GetPID() throws RemoteException;
+    public boolean GetGame(String pid) throws RemoteException;
+    public void KillGame(String pid) throws RemoteException;
+    public HashMap<Boolean, ArrayList<ResultColors>> Attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException;
+    public String GetLeaderBoard() throws RemoteException;
+    public void SetLeaderboard(String pid, String name, int attempts) throws RemoteException;
 }

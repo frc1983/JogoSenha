@@ -4,17 +4,13 @@ import Interfaces.ServerInterface;
 import Enumerators.GameColors;
 import static Enumerators.GameColors.getRandom;
 import Enumerators.ResultColors;
-import Models.Game;
 import Models.LeaderBoards;
-import static java.lang.System.in;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
@@ -28,16 +24,16 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
     }
 
     @Override
-    public String getPID() throws RemoteException {
+    public String GetPID() throws RemoteException {
         Helpers.ShowMessage.showMessage("server", "PidSever > Solicitacao");
         UUID id = UUID.randomUUID();
         return id.toString();
     }
 
     @Override
-    public boolean getGame(String pid) throws RemoteException {
+    public boolean GetGame(String pid) throws RemoteException {
         //Gerar uma senha para este jogo e coloca-lo na lista de <PId, Senha> do server
-        this.passwordsActiveGames.put(pid, generatePassword());
+        this.passwordsActiveGames.put(pid, GeneratePassword());
 
         Helpers.ShowMessage.showMessage("server", "Jogo criado para = " + pid);
         //Retorna true para jogo criado e false para erro ao criar o jogo
@@ -45,26 +41,28 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
     }
 
     @Override
-    public void killGame(String pid) throws RemoteException {
-        this.passwordsActiveGames.remove(pid);
+    public void KillGame(String pid) throws RemoteException {
+        if(this.passwordsActiveGames.containsKey(pid)){
+            this.passwordsActiveGames.remove(pid);
+        }
     }
 
     @Override
-    public HashMap<Boolean, ArrayList<ResultColors>> attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException {
+    public HashMap<Boolean, ArrayList<ResultColors>> Attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException {
         //Busca a resposta para o jogo do PID na lista de <PId, Senha> do server
         ArrayList<GameColors> password = this.passwordsActiveGames.get(pid);
 
-        return validateAttempt(password, attempt);
+        return ValidateAttempt(password, attempt);
     }
 
     @Override
-    public void setLeaderboard(String pid, String name, int attempts) throws RemoteException {
+    public void SetLeaderboard(String pid, String name, int attempts) throws RemoteException {
         Helpers.ShowMessage.showMessage("client", "Set leaderboard");
         this.leaderboard.put(pid, new LeaderBoards(name, attempts));
     }
 
     @Override
-    public String getLeaderBoard() throws RemoteException {
+    public String GetLeaderBoard() throws RemoteException {
         Helpers.ShowMessage.showMessage("client", "get leaderboard");
         
         StringBuilder result = new StringBuilder();
@@ -74,6 +72,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         if (this.leaderboard.size() <= 0) {
             result.append("Nenhum jogador encontrado.").append("\n");
         } else {
+            //TODO: Ordenar pontos asc
             for (Entry<String, LeaderBoards> item : this.leaderboard.entrySet()) {
                 result.append("Posição ").append(position)
                         .append(" Nome: ").append(item.getValue().getName())
@@ -86,7 +85,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         return result.toString();
     }
 
-    private ArrayList<GameColors> generatePassword() {
+    private ArrayList<GameColors> GeneratePassword() {
         ArrayList<GameColors> ret = new ArrayList<>(4);
 
         for (int i = 0; i < 4; i++) {
@@ -100,7 +99,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         return ret;
     }
 
-    private HashMap<Boolean, ArrayList<ResultColors>> validateAttempt(ArrayList<GameColors> password, ArrayList<GameColors> attempt) {
+    private HashMap<Boolean, ArrayList<ResultColors>> ValidateAttempt(ArrayList<GameColors> password, ArrayList<GameColors> attempt) {
         //Compara a tentativa recebida com a resposta
         //Retorna as cores de acordo com os acertos da tentativa   
         HashMap<Boolean, ArrayList<ResultColors>> result = new HashMap<>();
