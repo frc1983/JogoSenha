@@ -84,14 +84,6 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         StringBuilder result = new StringBuilder();
         int position = 1;
 
-        this.leaderboard.put("1", new LeaderBoards("Fabio", 4));
-        this.leaderboard.put("2", new LeaderBoards("Tiao", 2));
-        this.leaderboard.put("3", new LeaderBoards("Ze", 3));
-        this.leaderboard.put("4", new LeaderBoards("Lezinho", 2));
-        this.leaderboard.put("5", new LeaderBoards("Abestado", 9));
-        this.leaderboard.put("6", new LeaderBoards("Igordão", 12));
-        this.leaderboard.put("7", new LeaderBoards("Ivana", 1));
-
         Map<String, LeaderBoards> sorted = sortByLeaders(this.leaderboard);
 
         result.append("------------HALL DA FAMA------------").append("\n\n");
@@ -123,8 +115,8 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
             ret.add(i, color);
         }
         //Mostra a senha criada
-        Helpers.ShowMessage.showMessage("server", "Senha gerada!");
-        ShowPassword(ret);
+        //Helpers.ShowMessage.showMessage("server", "Senha gerada!");
+        //ShowPassword(ret);
 
         return ret;
     }
