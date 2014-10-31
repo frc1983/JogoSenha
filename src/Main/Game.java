@@ -224,7 +224,7 @@ public class Game {
             if (player == null) {
                 InitHackPlayer(s);
             }
-            
+            Helpers.ShowMessage.showMessage("client", "Escolha a senha!");
             p.InsertGame(player.getPid(), getColorsForAttempt(s));
             Helpers.ShowMessage.showMessage("client", "Envie as tentativas!");
             do {

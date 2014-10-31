@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import static javafx.scene.input.KeyCode.K;
-import static javafx.scene.input.KeyCode.V;
 
 public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 
@@ -44,7 +45,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         //Retorna true para jogo criado e false para erro ao criar o jogo
         return !this.passwordsActiveGames.get(pid).isEmpty();
     }
-    
+
     @Override
     public boolean InsertGame(String pid, ArrayList<GameColors> password) throws RemoteException {
         //Gerar uma senha para este jogo e coloca-lo na lista de <PId, Senha> do server
@@ -83,16 +84,28 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         StringBuilder result = new StringBuilder();
         int position = 1;
 
+        this.leaderboard.put("1", new LeaderBoards("Fabio", 4));
+        this.leaderboard.put("2", new LeaderBoards("Tiao", 2));
+        this.leaderboard.put("3", new LeaderBoards("Ze", 3));
+        this.leaderboard.put("4", new LeaderBoards("Lezinho", 2));
+        this.leaderboard.put("5", new LeaderBoards("Abestado", 9));
+        this.leaderboard.put("6", new LeaderBoards("Igordão", 12));
+        this.leaderboard.put("7", new LeaderBoards("Ivana", 1));
+
+        Map<String, LeaderBoards> sorted = sortByLeaders(this.leaderboard);
+
         result.append("------------HALL DA FAMA------------").append("\n\n");
         if (this.leaderboard.size() <= 0) {
             result.append("Nenhum jogador encontrado.").append("\n");
         } else {
-            for (Entry<String, LeaderBoards> item : this.leaderboard.entrySet()) {
+            for (Entry<String, LeaderBoards> item : sorted.entrySet()) {
                 result.append("Posição ").append(position)
                         .append(" Nome: ").append(item.getValue().getName())
                         .append(" Pontos: ").append(item.getValue().getPoints())
                         .append("\n");
                 position++;
+                if(position == 6)
+                    break;
             }
         }
         //retorna a lista de leaderboards do servidor (nome e pontos ou nro de tentativas)
@@ -109,10 +122,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
             }
             ret.add(i, color);
         }
-        
+        //Mostra a senha criada
         Helpers.ShowMessage.showMessage("server", "Senha gerada!");
         ShowPassword(ret);
-                
+
         return ret;
     }
 
@@ -147,5 +160,24 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         for (GameColors color : result) {
             Helpers.ShowMessage.showMessage("server", color.name());
         }
+    }
+
+    private static HashMap sortByLeaders(HashMap map) {
+        List list = new LinkedList(map.entrySet());
+        
+        Collections.sort(list, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o1)).getValue())
+                        .compareTo(((Map.Entry) (o2)).getValue());
+            }
+        });
+
+        HashMap sortedHashMap = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
     }
 }

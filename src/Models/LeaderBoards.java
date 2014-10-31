@@ -1,6 +1,6 @@
 package Models;
 
-public class LeaderBoards {
+public class LeaderBoards implements Comparable<LeaderBoards>{
     private String name;
     private int points;
     
@@ -15,5 +15,10 @@ public class LeaderBoards {
 
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public int compareTo(LeaderBoards o) {
+        return Integer.compare(this.getPoints(), o.getPoints());
     }
 }
