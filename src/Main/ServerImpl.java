@@ -9,9 +9,14 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import static javafx.scene.input.KeyCode.K;
+import static javafx.scene.input.KeyCode.V;
 
 public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 
@@ -39,10 +44,20 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         //Retorna true para jogo criado e false para erro ao criar o jogo
         return !this.passwordsActiveGames.get(pid).isEmpty();
     }
+    
+    @Override
+    public boolean InsertGame(String pid, ArrayList<GameColors> password) throws RemoteException {
+        //Gerar uma senha para este jogo e coloca-lo na lista de <PId, Senha> do server
+        this.passwordsActiveGames.put(pid, password);
+
+        Helpers.ShowMessage.showMessage("server", "Jogo criado para = " + pid);
+        //Retorna true para jogo criado e false para erro ao criar o jogo
+        return !this.passwordsActiveGames.get(pid).isEmpty();
+    }
 
     @Override
     public void KillGame(String pid) throws RemoteException {
-        if(this.passwordsActiveGames.containsKey(pid)){
+        if (this.passwordsActiveGames.containsKey(pid)) {
             this.passwordsActiveGames.remove(pid);
         }
     }
@@ -64,15 +79,14 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
     @Override
     public String GetLeaderBoard() throws RemoteException {
         Helpers.ShowMessage.showMessage("client", "get leaderboard");
-        
+
         StringBuilder result = new StringBuilder();
         int position = 1;
-        
+
         result.append("------------HALL DA FAMA------------").append("\n\n");
         if (this.leaderboard.size() <= 0) {
             result.append("Nenhum jogador encontrado.").append("\n");
         } else {
-            //TODO: Ordenar pontos asc
             for (Entry<String, LeaderBoards> item : this.leaderboard.entrySet()) {
                 result.append("Posição ").append(position)
                         .append(" Nome: ").append(item.getValue().getName())
@@ -95,7 +109,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
             }
             ret.add(i, color);
         }
-
+        
+        Helpers.ShowMessage.showMessage("server", "Senha gerada!");
+        ShowPassword(ret);
+                
         return ret;
     }
 
@@ -126,4 +143,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         return result;
     }
 
+    private void ShowPassword(ArrayList<GameColors> result) {
+        for (GameColors color : result) {
+            Helpers.ShowMessage.showMessage("server", color.name());
+        }
+    }
 }

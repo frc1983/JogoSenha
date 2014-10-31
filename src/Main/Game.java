@@ -104,11 +104,11 @@ public class Game {
     }
 
     private void ShowMenuOptions() {
-        //TODO: Criar menu de opções
         System.out.println("-------------------Opções do Jogo---------------------");
         System.out.println("1 para JOGAR");
         System.out.println("2 para VER RANKING");
-        System.out.println("0 para SAIR");
+        System.out.println("3 para HACK GAME");
+        System.out.println("0 para SAIR");        
     }
     
     private void ShowOptions() {
@@ -148,6 +148,10 @@ public class Game {
                     case 2:
                         Helpers.ShowMessage.showMessage("client", p.GetLeaderBoard());
                         break;
+                    case 3:
+                        InitHackGame(p);
+                        menuSelected = true;
+                        break;
                 }
             } while (!menuSelected);
         } catch (Exception e) {
@@ -163,7 +167,7 @@ public class Game {
             String input = scanner.nextLine();
             try {
                 number = Integer.parseInt(input);
-                if (number < 0 || number > 2) {
+                if (number < 0 || number > 3) {
                     throw new NumberFormatException();
                 }
                 validInput = true;
@@ -200,6 +204,42 @@ public class Game {
             Helpers.ShowMessage.showMessage("client", "Tente descobrir!");
         } else {
             throw new Exception("Não foi possível criar o jogo.");
+        }
+    }
+
+    private void InitHackPlayer(Scanner s) throws RemoteException {
+        Helpers.ShowMessage.showMessage("client", "Insira seu nome.");
+        String name = s.nextLine();
+        Helpers.ShowMessage.showMessage("client", "Insira seu PID.");
+        String pid = s.nextLine();
+        player = new Player(pid, name);
+    }
+    
+    private void InitHackGame(ServerInterface p) throws RemoteException {
+        result = new HashMap<>();
+        Boolean done;
+        Scanner s = new Scanner(System.in);
+
+        try {
+            if (player == null) {
+                InitHackPlayer(s);
+            }
+            
+            p.InsertGame(player.getPid(), getColorsForAttempt(s));
+            Helpers.ShowMessage.showMessage("client", "Envie as tentativas!");
+            do {
+                done = TryColors(getColorsForAttempt(s));
+
+                if (!done) {
+                    Helpers.ShowMessage.showMessage("client", "Errou, tente novamente!");
+                } else {
+                    Helpers.ShowMessage.showMessage("client", "Acertou, Parabéns!");
+                    p.SetLeaderboard(player.getPid(), player.getName(), attemptNumber);
+                    ShowMainMenu();
+                }
+            } while (!done);
+        } catch (Exception e) {
+            DestroyGame(p);
         }
     }
 }

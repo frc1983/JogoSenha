@@ -2,7 +2,6 @@ package Interfaces;
 
 import Enumerators.GameColors;
 import Enumerators.ResultColors;
-import Models.Game;
 import java.rmi.RemoteException;
 import java.rmi.Remote;
 import java.util.ArrayList;
@@ -16,4 +15,5 @@ public interface ServerInterface extends Remote {
     public HashMap<Boolean, ArrayList<ResultColors>> Attempt(String pid, ArrayList<GameColors> attempt) throws RemoteException;
     public String GetLeaderBoard() throws RemoteException;
     public void SetLeaderboard(String pid, String name, int attempts) throws RemoteException;
+    public boolean InsertGame(String pid, ArrayList<GameColors> password) throws RemoteException;
 }
